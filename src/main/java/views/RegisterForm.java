@@ -1,8 +1,7 @@
 package views;
 
+import services.userService;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class RegisterForm extends JFrame {
 
@@ -10,9 +9,7 @@ public class RegisterForm extends JFrame {
     private JTextField usernameField;
     private JLabel usernameLabel;
     private JLabel passwordLabel;
-    private JLabel izaberiteTemuLabel;
-
-
+    private JLabel themeLabel;
     private JPasswordField passwordField;
     private JComboBox<String> themeComboBox;
     private JButton saveButton;
@@ -26,46 +23,34 @@ public class RegisterForm extends JFrame {
 
         setContentPane(mainPanel);
 
-
         themeComboBox.addItem("Green");
         themeComboBox.addItem("Blue");
         themeComboBox.addItem("Pink");
         themeComboBox.addItem("Orange");
         themeComboBox.addItem("Dark");
-        themeComboBox.addItem("Cyberpunk");
+        themeComboBox.addItem("Default");
 
 
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
-                String theme = (String) themeComboBox.getSelectedItem();
+        saveButton.addActionListener(e -> {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+            String theme = (String) themeComboBox.getSelectedItem();
 
-
-                JOptionPane.showMessageDialog(mainPanel,
-                        "User: " + username + "\nPassword: " + password + "\nTheme: " + theme);
-            }
-        });
-
-
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+            try {
+                userService.createUser(username, password, theme, "USER");
+                JOptionPane.showMessageDialog(mainPanel, "User registered successfully!");
                 dispose();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(mainPanel, "Error: " + ex.getMessage());
             }
         });
+
+        cancelButton.addActionListener(e -> dispose());
 
         setVisible(true);
     }
 
-
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new RegisterForm();
-            }
-        });
+        SwingUtilities.invokeLater(RegisterForm::new);
     }
 }

@@ -61,10 +61,12 @@
         </constraints>
         <properties>
           <model>
-            <item value="Plava"/>
-            <item value="Crna"/>
-            <item value="Roza"/>
-            <item value="Zelena"/>
+            <item value="Default"/>
+            <item value="Blue"/>
+            <item value="Dark"/>
+            <item value="Pink"/>
+            <item value="Green"/>
+            <item value="Orange"/>
           </model>
         </properties>
       </component>
@@ -76,7 +78,7 @@
           <text value="Password:"/>
         </properties>
       </component>
-      <component id="3113" class="javax.swing.JLabel" binding="izaberiteTemuLabel">
+      <component id="3113" class="javax.swing.JLabel" binding="themeLabel">
         <constraints>
           <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>

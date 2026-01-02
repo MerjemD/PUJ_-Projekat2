@@ -1,34 +1,62 @@
 package views;
 
-        import javax.swing.*;
+import services.userService;
+import utils.ThemeManager;
+import javax.swing.*;
 
 public class LogInForm extends JFrame {
 
-    private JLabel logInLabel;
     private JPanel mainPanel;
     private JButton logInButton;
     private JButton cancelButton;
     private JTextField usernameField;
     private JPasswordField passwordField;
-    private JLabel passwordLabel;
+    private JLabel adminLinkLabel;
+    private JLabel logInLabel;
     private JLabel usernameLabel;
+    private JLabel passwordLabel;
 
     public LogInForm() {
         setTitle("Login");
+        setContentPane(mainPanel);
         setSize(400, 250);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        setContentPane(mainPanel);
+        adminLinkLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        adminLinkLabel.setForeground(java.awt.Color.BLUE);
+        adminLinkLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                new AdminLoginForm();
+            }
+        });
 
 
         logInButton.addActionListener(e -> {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
 
+            userService userService = new userService();
 
-            JOptionPane.showMessageDialog(mainPanel,
-                    "Username: " + username + "\nPassword: " + password);
+            try {
+                if (userService.loginAdmin(username, password)) {
+                    JOptionPane.showMessageDialog(mainPanel, "Admin login successful!");
+                    String theme = userService.getUserTheme(username);
+                    ThemeManager.applyTheme(mainPanel, theme);
+                    new MainMenuForm(username, "ADMIN", theme);
+                    dispose();
+                } else if (userService.loginUser(username, password)) {
+                    JOptionPane.showMessageDialog(mainPanel, "User login successful!");
+                    String theme = userService.getUserTheme(username);
+                    ThemeManager.applyTheme(mainPanel, theme);
+                    new MainMenuForm(username, "USER", theme);
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(mainPanel, "Invalid username or password!");
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(mainPanel, "Error: " + ex.getMessage());
+            }
         });
 
 
@@ -37,8 +65,8 @@ public class LogInForm extends JFrame {
         setVisible(true);
     }
 
-
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new LogInForm());
+        SwingUtilities.invokeLater(LogInForm::new);
     }
 }
+
