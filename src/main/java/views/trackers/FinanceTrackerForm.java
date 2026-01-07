@@ -1,11 +1,11 @@
 package views.trackers;
 
-import services.finance.TransactionManager;
 import models.finance.Transaction;
+import services.finance.TransactionManager;
+import utils.ThemeManager;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.util.ArrayList;
 
 public class FinanceTrackerForm {
 
@@ -13,31 +13,30 @@ public class FinanceTrackerForm {
     private JTextField amountField;
     private JTextField descriptionField;
     private JComboBox<String> typeCombo;
+    private JComboBox<String> categoryCombo;
     private JButton addButton;
+    private JButton updateButton;
+    private JButton deleteButton;
     private JTable transactionTable;
     private JLabel incomeLabel;
     private JLabel expensesLabel;
     private JLabel balanceLabel;
-    private JButton updateButton;
-    private JButton deleteButton;
     private JButton exportButton;
-    private JComboBox categoryCombo;
 
     private TransactionManager manager;
+    private String username;
 
-    public FinanceTrackerForm() {
 
+    public FinanceTrackerForm(String username, String theme) {
+        this.username = username;
         manager = new TransactionManager();
 
-        categoryCombo.addItem("Plata");
-        categoryCombo.addItem("Hrana");
-        categoryCombo.addItem("Racuni");
-        categoryCombo.addItem("Zabava");
-        categoryCombo.addItem("Prijevoz");
-        categoryCombo.addItem("Ostalo");
+        ThemeManager.applyTheme(mainPanel, theme);
+
 
         loadDataIntoTable();
         updateSummary();
+
 
         transactionTable.getSelectionModel().addListSelectionListener(e -> {
             int row = transactionTable.getSelectedRow();
@@ -49,6 +48,7 @@ public class FinanceTrackerForm {
             }
         });
 
+
         addButton.addActionListener(e -> {
             try {
                 String type = (String) typeCombo.getSelectedItem();
@@ -56,14 +56,7 @@ public class FinanceTrackerForm {
                 double amount = Double.parseDouble(amountField.getText());
                 String description = descriptionField.getText();
 
-                if (description.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Description cannot be empty");
-                    return;
-                }
-
-                Transaction t =
-                        new Transaction(type, amount, description, null, category);
-
+                Transaction t = new Transaction(username, type, amount, description, null, category);
                 manager.addTransaction(t);
 
                 loadDataIntoTable();
@@ -77,103 +70,61 @@ public class FinanceTrackerForm {
             }
         });
 
+
         updateButton.addActionListener(e -> {
             int row = transactionTable.getSelectedRow();
-            if (row == -1) {
-                JOptionPane.showMessageDialog(null, "Select a row first!");
-                return;
-            }
+            if (row == -1) return;
 
             String id = transactionTable.getValueAt(row, 3).toString();
-            String type = (String) typeCombo.getSelectedItem();
-            String category = (String) categoryCombo.getSelectedItem();
-            double amount = Double.parseDouble(amountField.getText());
-            String description = descriptionField.getText();
-
-            manager.updateTransaction(id, type, amount, description, category);
+            manager.updateTransaction(
+                    id,
+                    (String) typeCombo.getSelectedItem(),
+                    Double.parseDouble(amountField.getText()),
+                    descriptionField.getText(),
+                    (String) categoryCombo.getSelectedItem()
+            );
 
             loadDataIntoTable();
             updateSummary();
         });
 
+
         deleteButton.addActionListener(e -> {
             int row = transactionTable.getSelectedRow();
-            if (row == -1) {
-                JOptionPane.showMessageDialog(null, "Select a row!");
-                return;
-            }
+            if (row == -1) return;
 
-            int confirm = JOptionPane.showConfirmDialog(
-                    null,
-                    "Jeste li sigurni da želite izbrisati ovu transakciju?",
-                    "Potvrda brisanja",
-                    JOptionPane.YES_NO_OPTION
-            );
-
-            if (confirm == JOptionPane.YES_OPTION) {
-                String id = transactionTable.getValueAt(row, 3).toString();
-                manager.deleteTransaction(id);
-                loadDataIntoTable();
-                updateSummary();
-            }
-        });
-
-        exportButton.addActionListener(e -> {
-            try {
-                JFileChooser fileChooser = new JFileChooser();
-                if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-
-                    java.io.PrintWriter writer =
-                            new java.io.PrintWriter(fileChooser.getSelectedFile());
-
-                    writer.println("Ukupni prihod: " + manager.getTotalIncome());
-                    writer.println("Ukupni rashod: " + manager.getTotalExpense());
-                    writer.println("Stanje: " + (manager.getTotalIncome() - manager.getTotalExpense()));
-
-                    writer.close();
-                    JOptionPane.showMessageDialog(null, "Exportovan uspješno!");
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Greška pri exportu!");
-            }
+            manager.deleteTransaction(transactionTable.getValueAt(row, 3).toString());
+            loadDataIntoTable();
+            updateSummary();
         });
     }
 
+
     private void loadDataIntoTable() {
+        DefaultTableModel model = new DefaultTableModel(
+                new String[]{"Type", "Amount", "Description", "ID", "Category"}, 0
+        );
 
-        ArrayList<Transaction> list = manager.getAllTransactions();
-
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("Type");
-        model.addColumn("Amount");
-        model.addColumn("Description");
-        model.addColumn("ID");
-        model.addColumn("Category");
-
-        for (Transaction t : list) {
+        for (Transaction t : manager.getAllTransactions(username)) {
             model.addRow(new Object[]{
-                    t.getType(),
-                    t.getAmount(),
-                    t.getDescription(),
-                    t.getId(),
-                    t.getCategory()
+                    t.getType(), t.getAmount(), t.getDescription(), t.getId(), t.getCategory()
             });
         }
 
         transactionTable.setModel(model);
     }
 
-    private void updateSummary() {
-        double income = manager.getTotalIncome();
-        double expense = manager.getTotalExpense();
-        double balance = income - expense;
 
+    private void updateSummary() {
+        double income = manager.getTotalIncome(username);
+        double expense = manager.getTotalExpense(username);
         incomeLabel.setText("Income: " + income);
         expensesLabel.setText("Expenses: " + expense);
-        balanceLabel.setText("Balance: " + balance);
+        balanceLabel.setText("Balance: " + (income - expense));
     }
 
     public JPanel getMainPanel() {
         return mainPanel;
     }
 }
+

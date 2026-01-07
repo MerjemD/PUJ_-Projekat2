@@ -1,0 +1,10 @@
+views\LogInForm.class
+views\RegisterForm$3.class
+views\RegisterForm$2.class
+views\RegisterForm$1.class
+views\StartScreen$2.class
+views\StartScreen.class
+views\StartScreen$1.class
+views\RegisterForm.class
+views\StartScreen$3.class
+database\mongoDBConnection.class

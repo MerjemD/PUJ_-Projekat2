@@ -23,14 +23,6 @@ public class RegisterForm extends JFrame {
 
         setContentPane(mainPanel);
 
-        themeComboBox.addItem("Green");
-        themeComboBox.addItem("Blue");
-        themeComboBox.addItem("Pink");
-        themeComboBox.addItem("Orange");
-        themeComboBox.addItem("Dark");
-        themeComboBox.addItem("Default");
-
-
         saveButton.addActionListener(e -> {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());

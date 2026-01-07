@@ -33,6 +33,11 @@
         <properties>
           <model>
             <item value="Plata"/>
+            <item value="Hrana"/>
+            <item value="Racuni"/>
+            <item value="Zabava"/>
+            <item value="Prijevoz"/>
+            <item value="Ostalo"/>
           </model>
         </properties>
       </component>
@@ -43,6 +48,7 @@
         <properties>
           <model>
             <item value="Income"/>
+            <item value="Expense"/>
           </model>
         </properties>
       </component>

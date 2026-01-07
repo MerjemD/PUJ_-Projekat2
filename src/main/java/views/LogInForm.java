@@ -17,7 +17,7 @@ public class LogInForm extends JFrame {
     private JLabel passwordLabel;
 
     public LogInForm() {
-        setTitle("Login");
+
         setContentPane(mainPanel);
         setSize(400, 250);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -49,8 +49,11 @@ public class LogInForm extends JFrame {
                     JOptionPane.showMessageDialog(mainPanel, "User login successful!");
                     String theme = userService.getUserTheme(username);
                     ThemeManager.applyTheme(mainPanel, theme);
-                    new MainMenuForm(username, "USER", theme);
+
+                    MainMenuForm menu = new MainMenuForm(username, "USER", theme);
+                    menu.setVisible(true);
                     dispose();
+
                 } else {
                     JOptionPane.showMessageDialog(mainPanel, "Invalid username or password!");
                 }
